@@ -1,12 +1,14 @@
-doctype html
-html
-  head
-    title Users
-  body
-    h1 Study Buddy Users
+extends layout
 
-    ul
-      each user in users
-        li
-          a(href=`/users/${user.id}`)= user.name
-          |  - #{user.course} (Year #{user.year_of_study})
+block content
+  .hero
+    h1 Study Buddy Users
+    p Browse learner and mentor profiles.
+
+  .user-list
+    each user in users
+      .user-card
+        h2= user.name
+        p.meta #{user.course} · Year #{user.year_of_study}
+        .actions
+          a.button(href=`/users/${user.id}`) View Profile

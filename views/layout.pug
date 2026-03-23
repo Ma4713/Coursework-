@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title #{title} | Study Buddy
+    link(rel='stylesheet', href='/styles.css')
+  body
+    header.site-header
+      .site-header-inner
+        .brand Study <span>Buddy</span>
+        nav.nav
+          a(class=activePage === 'home' ? 'active' : '', href='/') Home
+          a(class=activePage === 'users' ? 'active' : '', href='/users') Users
+          a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
+
+    main.page
+      block content

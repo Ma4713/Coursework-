@@ -1,24 +1,32 @@
-doctype html
-html
-  head
-    title User Profile
-  body
-    h1= user.name
+extends layout
 
-    p
-      strong Course:
-      |  #{user.course}
+block content
+  .hero
+    .profile-header
+      .avatar= user[0].name.charAt(0)
+      .profile-main
+        h1= user[0].name
+        p.meta #{user[0].course} · Year #{user[0].year_of_study}
+        p= user[0].bio
 
-    p
-      strong Year of Study:
-      |  #{user.year_of_study}
+  .two-col
+    .info-block
+      h3 Needs Help With
+      ul
+        each item in user
+          if item.type === 'needs_help'
+            li= item.subject_name
+      if !user.some(item => item.type === 'needs_help')
+        .empty No subjects listed.
 
-    p
-      strong Bio:
-      |  #{user.bio}
+    .info-block
+      h3 Confident In
+      ul
+        each item in user
+          if item.type === 'confident_in'
+            li= item.subject_name
+      if !user.some(item => item.type === 'confident_in')
+        .empty No subjects listed.
 
-    p
-      strong Offers Help:
-      |  #{user.offers_help ? 'Yes' : 'No'}
-
-    a(href='/users') Back to Users List
+  .actions
+    a.button-secondary(href='/users') Back to Users

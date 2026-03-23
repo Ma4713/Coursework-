@@ -1,19 +1,16 @@
-doctype html
-html
-  head
-    title Sessions
-  body
+extends layout
+
+block content
+  .hero
     h1 Study Sessions
+    p Browse current sessions and open a session for more detail.
 
+  .session-list
     each session in sessions
-      div
+      .session-card
         h2= session.title
-        p= 'Subject: ' + session.subject_name
-        p= 'Mentor: ' + session.mentor_name
-        p= 'Time: ' + session.session_time
-        a(href=`/sessions/${session.id}`) View Details
-        hr
-
-    a(href='/') Back to Home
-
-    
+        p.meta Subject: #{session.subject_name}
+        p.meta Mentor: #{session.mentor_name}
+        p.meta Time: #{session.session_time}
+        .actions
+          a.button(href=`/sessions/${session.id}`) View Details

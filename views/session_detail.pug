@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .hero
+    h1= session.title
+    p.meta Subject: #{session.subject_name}
+    p.meta Mentor: #{session.mentor_name}
+    p.meta Time: #{session.session_time}
+    p.meta Location: #{session.location}
+
+  .card
+    h2.section-title Session Description
+    p= session.description
+
+  .actions
+    a.button-secondary(href='/sessions') Back to Sessions

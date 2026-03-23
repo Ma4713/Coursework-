@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 // Home route
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { title: "Home", activePage: "home" });
 });
 
 // Users route
@@ -24,7 +24,11 @@ app.get("/users", (req, res) => {
       return res.send("Error fetching users");
     }
 
-    res.render("users", { users: results });
+    res.render("users", {
+      users: results,
+      title: "Users",
+      activePage: "users",
+    });
   });
 });
 
@@ -33,7 +37,13 @@ app.get("/users/:id", (req, res) => {
   const userId = req.params.id;
 
   connection.query(
-    "SELECT * FROM users WHERE id = ?",
+    `
+    SELECT users.*, subjects.name AS subject_name, user_subjects.type
+    FROM users
+    LEFT JOIN user_subjects ON users.id = user_subjects.user_id
+    LEFT JOIN subjects ON user_subjects.subject_id = subjects.id
+    WHERE users.id = ?
+    `,
     [userId],
     (err, results) => {
       if (err) {
@@ -45,11 +55,16 @@ app.get("/users/:id", (req, res) => {
         return res.send("User not found");
       }
 
-      res.render("profile", { user: results[0] });
+      res.render("profile", {
+        user: results,
+        title: results[0].name,
+        activePage: "users",
+      });
     },
   );
 });
 
+// Sessions route
 app.get("/sessions", (req, res) => {
   connection.query(
     `
@@ -57,7 +72,7 @@ app.get("/sessions", (req, res) => {
     FROM sessions
     JOIN users ON sessions.mentor_id = users.id
     JOIN subjects ON sessions.subject_id = subjects.id
-  `,
+    `,
     (err, results) => {
       if (err) {
         console.error(err);
@@ -65,7 +80,44 @@ app.get("/sessions", (req, res) => {
       }
 
       console.log("SESSIONS RESULTS:", results);
-      res.render("sessions", { sessions: results });
+
+      res.render("sessions", {
+        sessions: results,
+        title: "Sessions",
+        activePage: "sessions",
+      });
+    },
+  );
+});
+
+// Session detail route
+app.get("/sessions/:id", (req, res) => {
+  const sessionId = req.params.id;
+
+  connection.query(
+    `
+    SELECT sessions.*, users.name AS mentor_name, subjects.name AS subject_name
+    FROM sessions
+    JOIN users ON sessions.mentor_id = users.id
+    JOIN subjects ON sessions.subject_id = subjects.id
+    WHERE sessions.id = ?
+    `,
+    [sessionId],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error fetching session");
+      }
+
+      if (results.length === 0) {
+        return res.send("Session not found");
+      }
+
+      res.render("session_detail", {
+        session: results[0],
+        title: results[0].title,
+        activePage: "sessions",
+      });
     },
   );
 });
@@ -74,3 +126,5 @@ app.get("/sessions", (req, res) => {
 app.listen(3000, () => {
   console.log("Study Buddy running on http://localhost:3000");
 });
+
+

@@ -1,7 +1,21 @@
-doctype html
-html
-  head
-    title Study Buddy
-  body
-    h1 Study Buddy
-    p It works!
+extends layout
+
+block content
+  .hero
+    h1 Welcome to Study Buddy
+    p A peer-support platform where students can connect, offer help, and find study sessions in a simple and supportive environment.
+
+  .grid.grid-2
+    .card
+      h2.section-title Browse Students
+      p View learner and mentor profiles, including course details and subject strengths.
+      .actions
+        a.button(href='/users') View Users
+
+    .card
+      h2.section-title Explore Sessions
+      p See available study sessions, subjects, mentors, and upcoming times.
+      .actions
+        a.button(href='/sessions') View Sessions
+
+  p.footer-note Designed as an improved live version of the Sprint 2 Study Buddy design.
