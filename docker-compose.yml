@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -13,6 +13,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: studybuddy
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -24,5 +26,3 @@ services:
       PMA_PASSWORD: password
     depends_on:
       - db
-
-   
