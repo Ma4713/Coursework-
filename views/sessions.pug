@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Sessions
+  body
+    h1 Study Sessions
+
+    each session in sessions
+      div
+        h2= session.title
+        p= 'Subject: ' + session.subject_name
+        p= 'Mentor: ' + session.mentor_name
+        p= 'Time: ' + session.session_time
+        a(href=`/sessions/${session.id}`) View Details
+        hr
+
+    a(href='/') Back to Home
+
+    

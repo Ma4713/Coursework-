@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    title User Profile
+  body
+    h1= user.name
+
+    p
+      strong Course:
+      |  #{user.course}
+
+    p
+      strong Year of Study:
+      |  #{user.year_of_study}
+
+    p
+      strong Bio:
+      |  #{user.bio}
+
+    p
+      strong Offers Help:
+      |  #{user.offers_help ? 'Yes' : 'No'}
+
+    a(href='/users') Back to Users List

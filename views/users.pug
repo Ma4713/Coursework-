@@ -8,6 +8,5 @@ html
     ul
       each user in users
         li
-          strong= user.name
+          a(href=`/users/${user.id}`)= user.name
           |  - #{user.course} (Year #{user.year_of_study})
-          

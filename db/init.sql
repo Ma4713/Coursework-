@@ -45,7 +45,6 @@ INSERT INTO users (name, course, year_of_study, bio, offers_help) VALUES
 ('Aung Min', 'BSc Software Engineering', '2', 'Second-year student looking for help with core software engineering concepts.', FALSE),
 ('Emily Carter', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE);
 
-
 INSERT INTO subjects (name) VALUES
 ('Software Engineering'),
 ('Algorithms'),
@@ -55,12 +54,9 @@ INSERT INTO subjects (name) VALUES
 INSERT INTO user_subjects (user_id, subject_id, type) VALUES
 (1, 1, 'needs_help'),
 (1, 2, 'needs_help'),
-(1, 3, 'confident_in'),
 (2, 1, 'confident_in'),
-(2, 4, 'confident_in'),
-(3, 2, 'confident_in'),
-(3, 4, 'needs_help');
+(2, 4, 'confident_in');
 
 INSERT INTO sessions (title, description, subject_id, mentor_id, session_time, location) VALUES
 ('Software Engineering Fundamentals', 'A session covering the basics of software engineering principles.', 1, 2, '2026-03-15 15:00:00', 'Library Room 2'),
-('Algorithms Revision Group', 'Collaborative revision session for sorting and searching algorithms.', 2, 3, '2026-03-16 14:00:00', 'Online');
+('Algorithms Revision Group', 'Collaborative revision session for sorting and searching algorithms.', 2, 2, '2026-03-16 14:00:00', 'Online');
