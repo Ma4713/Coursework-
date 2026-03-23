@@ -43,8 +43,8 @@ CREATE TABLE sessions (
 
 INSERT INTO users (name, course, year_of_study, bio, offers_help) VALUES
 ('Aung Min', 'BSc Software Engineering', '2', 'Second-year student looking for help with core software engineering concepts.', FALSE),
-('Emily Carter', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE),
-('Sara Khan', 'BSc Computer Science', '2', 'Interested in peer learning and group study sessions.', TRUE);
+('Emily Carter', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE);
+
 
 INSERT INTO subjects (name) VALUES
 ('Software Engineering'),
