@@ -1,16 +1,24 @@
 extends layout
 
 block content
-  .hero
+  .page-hero
     h1 Study Sessions
-    p Browse current sessions and open a session for more detail.
+    p Browse and join upcoming study sessions.
 
-  .session-list
+  .toolbar
+    input.search-bar(type='text', placeholder='Search sessions...')
+    .filters
+      .filter-pill Subject
+      .filter-pill Time
+      .filter-pill Availability
+
+  .session-grid
     each session in sessions
-      .session-card
-        h2= session.title
-        p.meta Subject: #{session.subject_name}
-        p.meta Mentor: #{session.mentor_name}
-        p.meta Time: #{session.session_time}
-        .actions
-          a.button(href=`/sessions/${session.id}`) View Details
+      .card
+        h2.card-title= session.title
+        .subject-tags
+          span.subject-tag= session.subject_name
+        p.meta Date / Time: #{session.session_time}
+        p.meta Hosted by: #{session.mentor_name}
+        .actions-row
+          a.button-secondary(href=`/sessions/${session.id}`) View Details

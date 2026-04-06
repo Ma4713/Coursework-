@@ -8,11 +8,14 @@ html
   body
     header.site-header
       .site-header-inner
-        .brand Study <span>Buddy</span>
+        a.brand(href='/')
+          img.brand-logo(src='/images/studybuddy-logo.png', alt='Study Buddy logo')
+
         nav.nav
           a(class=activePage === 'home' ? 'active' : '', href='/') Home
           a(class=activePage === 'users' ? 'active' : '', href='/users') Users
           a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
+      .header-line
 
     main.page
       block content

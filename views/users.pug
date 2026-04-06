@@ -1,14 +1,25 @@
 extends layout
 
 block content
-  .hero
-    h1 Study Buddy Users
-    p Browse learner and mentor profiles.
+  .page-hero.center
+    h1 User List
+    p Browse through learners and mentors to connect with your study buddies.
 
-  .user-list
+  .toolbar
+    input.search-bar(type='text', placeholder='Search by subject...')
+    .filters
+      .filter-pill All Subjects
+      .filter-pill Learners
+      .filter-pill Mentors
+
+  .user-grid
     each user in users
-      .user-card
-        h2= user.name
-        p.meta #{user.course} · Year #{user.year_of_study}
-        .actions
-          a.button(href=`/users/${user.id}`) View Profile
+      .card.center
+        .avatar-medium= user.name.charAt(0)
+        h2.card-title= user.name
+        p.meta Role: #{user.offers_help ? 'Mentor' : 'Learner'}
+        .actions-row.center
+          a.button-secondary(href=`/users/${user.id}`) View Profile
+
+  .footer-action
+    a.button(href='/sessions') View Study Sessions

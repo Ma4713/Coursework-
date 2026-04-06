@@ -1,16 +1,33 @@
 extends layout
 
 block content
-  .hero
-    h1= session.title
-    p.meta Subject: #{session.subject_name}
-    p.meta Mentor: #{session.mentor_name}
-    p.meta Time: #{session.session_time}
-    p.meta Location: #{session.location}
+  .page-hero
+    h1 Study Session Detail
 
-  .card
-    h2.section-title Session Description
-    p= session.description
+  .session-detail-layout
+    .session-summary
+      h2= session.title
+      .divider
+      .subject-tags
+        span.subject-tag= session.subject_name
+      p.meta Date / Time: #{session.session_time}
+      p.meta Location: #{session.location}
+      p
+        strong Description:
+      p= session.description
+      .actions-row
+        a.button(href='/sessions') Join Session
 
-  .actions
-    a.button-secondary(href='/sessions') Back to Sessions
+    .host-panel.center
+      h3 Hosted by
+      p.card-title= session.mentor_name
+      .avatar-medium= session.mentor_name.charAt(0)
+      .actions-row.center
+        a.button-secondary(href=`/users/${session.mentor_user_id}`) View Profile
+
+  .feedback-panel
+    h3 Session Feedback
+    .divider
+    p This session page is ready for future private feedback functionality.
+    .actions-row
+      a.button-secondary(href='/sessions') Back to Sessions

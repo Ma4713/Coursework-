@@ -1,32 +1,45 @@
 extends layout
 
 block content
-  .hero
-    .profile-header
-      .avatar= user[0].name.charAt(0)
-      .profile-main
-        h1= user[0].name
-        p.meta #{user[0].course} · Year #{user[0].year_of_study}
-        p= user[0].bio
+  .profile-layout
+    .profile-side.center
+      .avatar-large= user[0].name.charAt(0)
+      h1.profile-name= user[0].name
+      p.card-subtitle= user[0].course
+      p.meta Year: #{user[0].year_of_study}
+      .role-badge= user[0].offers_help ? 'Mentor' : 'Learner'
 
-  .two-col
-    .info-block
-      h3 Needs Help With
-      ul
-        each item in user
-          if item.type === 'needs_help'
-            li= item.subject_name
-      if !user.some(item => item.type === 'needs_help')
-        .empty No subjects listed.
+    .profile-main
+      h2.card-title User Profile
 
-    .info-block
-      h3 Confident In
-      ul
-        each item in user
-          if item.type === 'confident_in'
-            li= item.subject_name
-      if !user.some(item => item.type === 'confident_in')
-        .empty No subjects listed.
+      .info-grid
+        .info-box
+          h3 Needs Help With
+          .subject-tags
+            each item in user
+              if item.type === 'needs_help'
+                span.subject-tag= item.subject_name
+          if !user.some(item => item.type === 'needs_help')
+            p.empty No subjects listed.
 
-  .actions
-    a.button-secondary(href='/users') Back to Users
+        .info-box
+          h3 Confident In
+          .subject-tags
+            each item in user
+              if item.type === 'confident_in'
+                span.subject-tag= item.subject_name
+          if !user.some(item => item.type === 'confident_in')
+            p.empty No subjects listed.
+
+        .info-box
+          h3 Bio
+          p= user[0].bio || 'No bio available.'
+
+        .info-box
+          h3 Availability
+          p Mon–Fri
+          p 14:30–18:00
+
+      .actions-row
+        a.button(href='/sessions') Request Study Buddy
+        a.button-secondary(href='/users') Back to Users
