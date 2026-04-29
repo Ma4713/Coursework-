@@ -277,6 +277,29 @@ app.get("/admin/users", requireAdmin, (req, res) => {
   });
 });
 
+app.get("/admin/sessions", requireAdmin, (req, res) => {
+  connection.query(
+    `
+    SELECT sessions.*, users.name AS mentor_name, subjects.name AS subject_name
+    FROM sessions
+    JOIN users ON sessions.mentor_id = users.id
+    JOIN subjects ON sessions.subject_id = subjects.id
+    `,
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error loading sessions");
+      }
+
+      res.render("admin_sessions", {
+        title: "Manage Sessions",
+        sessions: results,
+        activePage: "admin",
+      });
+    },
+  );
+});
+
 app.listen(3000, () => {
   console.log("Study Buddy running on http://localhost:3000");
 });

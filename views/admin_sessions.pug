@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Manage Sessions
+    p System Administrator session overview.
+
+  .card
+    table
+      thead
+        tr
+          th Title
+          th Subject
+          th Mentor
+          th Time
+          th Location
+      tbody
+        each session in sessions
+          tr
+            td #{session.title}
+            td #{session.subject_name}
+            td #{session.mentor_name}
+            td #{session.session_time}
+            td #{session.location}
+
+  .footer-action
+    a.button-secondary(href='/admin') Back to Dashboard
