@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Create Account
+    p Register as a Study Buddy student user.
+
+  .card
+    form(method='POST', action='/register')
+      p
+        label Name
+        br
+        input.search-bar(type='text', name='name', required=true)
+
+      p
+        label Email
+        br
+        input.search-bar(type='email', name='email', required=true)
+
+      p
+        label Password
+        br
+        input.search-bar(type='password', name='password', required=true)
+
+      p
+        label Course
+        br
+        input.search-bar(type='text', name='course', required=true)
+
+      p
+        label Year of Study
+        br
+        input.search-bar(type='text', name='year_of_study', required=true)
+
+      button.button(type='submit') Register
+
+  .footer-action
+    a.button-secondary(href='/login') Already have an account? Login

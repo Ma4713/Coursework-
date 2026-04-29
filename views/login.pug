@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Login
+    p Access your Study Buddy account.
+
+  .card
+    form(method='POST', action='/login')
+      p
+        label Email
+        br
+        input.search-bar(type='email', name='email', required=true)
+
+      p
+        label Password
+        br
+        input.search-bar(type='password', name='password', required=true)
+
+      button.button(type='submit') Login
+
+  .footer-action
+    a.button-secondary(href='/register') Create a new account

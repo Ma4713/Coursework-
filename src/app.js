@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
 const connection = require("./db/connection");
 
 const app = express();
@@ -7,6 +9,16 @@ const app = express();
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "../views"));
 app.use(express.static(path.join(__dirname, "../public")));
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  session({
+    secret: "studybuddy-secret",
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 
 app.get("/", (req, res) => {
   res.render("index", { title: "Home", activePage: "home" });
@@ -24,6 +36,94 @@ app.get("/users", (req, res) => {
       title: "Users",
       activePage: "users",
     });
+  });
+});
+
+app.get("/register", (req, res) => {
+  res.render("register", {
+    title: "Register",
+    activePage: "register",
+  });
+});
+
+app.post("/register", async (req, res) => {
+  const { name, email, password, course, year_of_study } = req.body;
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  connection.query(
+    `INSERT INTO users (name, email, password_hash, course, year_of_study, bio, offers_help, role)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      name,
+      email,
+      passwordHash,
+      course,
+      year_of_study,
+      "New Study Buddy user.",
+      false,
+      "student",
+    ],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error creating account");
+      }
+
+      res.redirect("/login");
+    },
+  );
+});
+
+
+app.get("/login", (req, res) => {
+  res.render("login", {
+    title: "Login",
+    activePage: "login",
+  });
+});
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  connection.query(
+    "SELECT * FROM users WHERE email = ?",
+    [email],
+    async (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Login error");
+      }
+
+      if (results.length === 0) {
+        return res.send("Invalid email or password");
+      }
+
+      const user = results[0];
+      const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+      if (!passwordMatch) {
+        return res.send("Invalid email or password");
+      }
+
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+      };
+
+      if (user.role === "admin") {
+        return res.redirect("/admin");
+      }
+
+      res.redirect("/");
+    },
+  );
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/");
   });
 });
 
