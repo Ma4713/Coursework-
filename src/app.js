@@ -20,11 +20,25 @@ app.use(
   }),
 );
 
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "admin") {
+    return res.status(403).send("Access denied");
+  }
+  next();
+}
+
 app.get("/", (req, res) => {
   res.render("index", { title: "Home", activePage: "home" });
 });
 
-app.get("/users", (req, res) => {
+app.get("/users", requireLogin, (req, res) => {
   connection.query("SELECT * FROM users", (err, results) => {
     if (err) {
       console.error(err);
@@ -127,7 +141,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", requireLogin, (req, res) => {
   const userId = req.params.id;
 
   connection.query(
@@ -158,7 +172,7 @@ app.get("/users/:id", (req, res) => {
   );
 });
 
-app.get("/sessions", (req, res) => {
+app.get("/sessions", requireLogin, (req, res) => {
   connection.query(
     `
     SELECT sessions.*, users.name AS mentor_name, subjects.name AS subject_name
@@ -181,7 +195,7 @@ app.get("/sessions", (req, res) => {
   );
 });
 
-app.get("/sessions/:id", (req, res) => {
+app.get("/sessions/:id", requireLogin, (req, res) => {
   const sessionId = req.params.id;
 
   connection.query(
