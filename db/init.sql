@@ -9,10 +9,13 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
   course VARCHAR(100) NOT NULL,
   year_of_study VARCHAR(20) NOT NULL,
   bio TEXT,
-  offers_help BOOLEAN DEFAULT FALSE
+  offers_help BOOLEAN DEFAULT FALSE,
+  role ENUM('student', 'admin') DEFAULT 'student'
 );
 
 CREATE TABLE subjects (
@@ -41,9 +44,10 @@ CREATE TABLE sessions (
   FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-INSERT INTO users (name, course, year_of_study, bio, offers_help) VALUES
-('Aung Min', 'BSc Software Engineering', '2', 'Second-year student looking for help with core software engineering concepts.', FALSE),
-('Emily Carter', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE);
+INSERT INTO users (name, email, password_hash, course, year_of_study, bio, offers_help, role) VALUES
+('Aung Min', 'aung@studybuddy.com', '$2b$10$examplehashstudent1', 'BSc Software Engineering', '2', 'Second-year student looking for help with core software engineering concepts.', FALSE, 'student'),
+('Emily Carter', 'emily@studybuddy.com', '$2b$10$examplehashstudent2', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE, 'student'),
+('System Admin', 'admin@studybuddy.com', '$2b$10$examplehashadmin', 'Platform Administration', 'N/A', 'Technical system administrator responsible for maintaining Study Buddy.', FALSE, 'admin');
 
 INSERT INTO subjects (name) VALUES
 ('Software Engineering'),
