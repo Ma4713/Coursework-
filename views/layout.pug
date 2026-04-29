@@ -17,6 +17,8 @@ html
           a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
           a(class=activePage === 'login' ? 'active' : '', href='/login') Login
           a(class=activePage === 'register' ? 'active' : '', href='/register') Register
+          if session && session.user && session.user.role === 'admin'
+          a(class=activePage === 'admin' ? 'active' : '', href='/admin') Admin
           a(href='/logout') Logout
       .header-line
 

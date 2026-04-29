@@ -20,6 +20,11 @@ app.use(
   }),
 );
 
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
 function requireLogin(req, res, next) {
   if (!req.session.user) {
     return res.redirect("/login");
@@ -224,6 +229,52 @@ app.get("/sessions/:id", requireLogin, (req, res) => {
       });
     },
   );
+});
+
+app.get("/admin", requireAdmin, (req, res) => {
+  connection.query(
+    "SELECT COUNT(*) AS totalUsers FROM users",
+    (err, usersResult) => {
+      if (err) return res.send("Error loading users count");
+
+      connection.query(
+        "SELECT COUNT(*) AS totalSessions FROM sessions",
+        (err, sessionsResult) => {
+          if (err) return res.send("Error loading sessions count");
+
+          connection.query(
+            "SELECT COUNT(*) AS totalSubjects FROM subjects",
+            (err, subjectsResult) => {
+              if (err) return res.send("Error loading subjects count");
+
+              res.render("admin", {
+                title: "Admin Dashboard",
+                activePage: "admin",
+                totalUsers: usersResult[0].totalUsers,
+                totalSessions: sessionsResult[0].totalSessions,
+                totalSubjects: subjectsResult[0].totalSubjects,
+              });
+            },
+          );
+        },
+      );
+    },
+  );
+});
+
+app.get("/admin/users", requireAdmin, (req, res) => {
+  connection.query("SELECT * FROM users", (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.send("Error loading users");
+    }
+
+    res.render("admin_users", {
+      title: "Manage Users",
+      users: results,
+      activePage: "admin",
+    });
+  });
 });
 
 app.listen(3000, () => {

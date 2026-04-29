@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Manage Users
+    p System Administrator control panel.
+
+  .card
+    table
+      thead
+        tr
+          th ID
+          th Name
+          th Email
+          th Role
+      tbody
+        each user in users
+          tr
+            td #{user.id}
+            td #{user.name}
+            td #{user.email}
+            td #{user.role}
+
+  .footer-action
+    a.button-secondary(href='/admin') Back to Dashboard

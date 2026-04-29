@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Admin Dashboard
+    p Manage Study Buddy platform data.
+
+  .card
+    h2 Platform Overview
+
+    p Total Users: #{totalUsers}
+    p Total Sessions: #{totalSessions}
+    p Total Subjects: #{totalSubjects}
+
+  .actions-row
+    a.button(href='/admin/users') Manage Users
+    a.button-secondary(href='/sessions') View Sessions
+
+  .footer-action
+    a.button(href='/users') View Users
+    a.button(href='/sessions') View Sessions
+    
