@@ -6,11 +6,11 @@ block content
     p Browse and join upcoming study sessions.
 
   .toolbar
-    input.search-bar(type='text', placeholder='Search sessions...')
-    .filters
-      .filter-pill Subject
-      .filter-pill Time
-      .filter-pill Availability
+    form(method='GET', action='/sessions')
+      input.search-bar(type='text', name='search', placeholder='Search by subject or title...', value=search)
+      .actions-row
+        button.button(type='submit') Search
+        a.button-secondary(href='/sessions') Reset
 
   .session-grid
     each session in sessions
@@ -22,3 +22,4 @@ block content
         p.meta Hosted by: #{session.mentor_name}
         .actions-row
           a.button-secondary(href=`/sessions/${session.id}`) View Details
+          a.button(href=`/sessions/${session.id}/join`) Join Session

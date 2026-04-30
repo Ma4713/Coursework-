@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Session Joined
+    p You have successfully joined this study session.
+
+  .card
+    h2.card-title= session.title
+    p.meta Subject: #{session.subject_name}
+    p.meta Time: #{session.session_time}
+    p.meta Location: #{session.location}
+
+    .actions-row
+      a.button(href='/sessions') Back to Sessions
+      a.button-secondary(href=`/sessions/${session.id}`) View Session

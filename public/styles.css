@@ -351,4 +351,28 @@ a {
   .brand-logo {
     height: 64px;
   }
+
+  .grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eadfd4;
+  text-align: left;
+}
+
+th {
+  color: var(--primary-dark);
+  background: #fff4e8;
+}
 }

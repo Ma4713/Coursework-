@@ -39,11 +39,18 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function requireStudent(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "student") {
+    return res.status(403).send("Student access only");
+  }
+  next();
+}
+
 app.get("/", (req, res) => {
   res.render("index", { title: "Home", activePage: "home" });
 });
 
-app.get("/users", requireLogin, (req, res) => {
+app.get("/users", requireStudent, (req, res) => {
   connection.query("SELECT * FROM users", (err, results) => {
     if (err) {
       console.error(err);
@@ -146,7 +153,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/users/:id", requireLogin, (req, res) => {
+app.get("/users/:id", requireStudent, (req, res) => {
   const userId = req.params.id;
 
   connection.query(
@@ -177,14 +184,18 @@ app.get("/users/:id", requireLogin, (req, res) => {
   );
 });
 
-app.get("/sessions", requireLogin, (req, res) => {
+app.get("/sessions", requireStudent, (req, res) => {
+  const search = req.query.search || "";
+
   connection.query(
     `
     SELECT sessions.*, users.name AS mentor_name, subjects.name AS subject_name
     FROM sessions
     JOIN users ON sessions.mentor_id = users.id
     JOIN subjects ON sessions.subject_id = subjects.id
+    WHERE sessions.title LIKE ? OR subjects.name LIKE ?
     `,
+    [`%${search}%`, `%${search}%`],
     (err, results) => {
       if (err) {
         console.error(err);
@@ -193,6 +204,7 @@ app.get("/sessions", requireLogin, (req, res) => {
 
       res.render("sessions", {
         sessions: results,
+        search,
         title: "Sessions",
         activePage: "sessions",
       });
@@ -200,7 +212,7 @@ app.get("/sessions", requireLogin, (req, res) => {
   );
 });
 
-app.get("/sessions/:id", requireLogin, (req, res) => {
+app.get("/sessions/:id", requireStudent, (req, res) => {
   const sessionId = req.params.id;
 
   connection.query(
@@ -228,6 +240,36 @@ app.get("/sessions/:id", requireLogin, (req, res) => {
         activePage: "sessions",
       });
     },
+  );
+});
+
+app.get("/sessions/:id/join", requireStudent, (req, res) => {
+  const sessionId = req.params.id;
+
+  connection.query(
+    `
+    SELECT sessions.*, subjects.name AS subject_name
+    FROM sessions
+    JOIN subjects ON sessions.subject_id = subjects.id
+    WHERE sessions.id = ?
+    `,
+    [sessionId],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error joining session");
+      }
+
+      if (results.length === 0) {
+        return res.send("Session not found");
+      }
+
+      res.render("join_session", {
+        session: results[0],
+        title: "Join Session",
+        activePage: "sessions",
+      });
+    }
   );
 });
 

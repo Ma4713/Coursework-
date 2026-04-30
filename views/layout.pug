@@ -13,13 +13,20 @@ html
 
         nav.nav
           a(class=activePage === 'home' ? 'active' : '', href='/') Home
-          a(class=activePage === 'users' ? 'active' : '', href='/users') Users
-          a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
-          a(class=activePage === 'login' ? 'active' : '', href='/login') Login
-          a(class=activePage === 'register' ? 'active' : '', href='/register') Register
-          if session && session.user && session.user.role === 'admin'
-          a(class=activePage === 'admin' ? 'active' : '', href='/admin') Admin
-          a(href='/logout') Logout
+
+          if !session.user
+            a(class=activePage === 'login' ? 'active' : '', href='/login') Login
+            a(class=activePage === 'register' ? 'active' : '', href='/register') Register
+
+          if session.user && session.user.role === 'student'
+            a(class=activePage === 'users' ? 'active' : '', href='/users') Users
+            a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
+            a(href='/logout') Logout
+
+          if session.user && session.user.role === 'admin'
+            a(class=activePage === 'admin' ? 'active' : '', href='/admin') Admin Dashboard
+            a(href='/logout') Logout
+
       .header-line
 
     main.page
