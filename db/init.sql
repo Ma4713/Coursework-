@@ -11,8 +11,8 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  course VARCHAR(100) NOT NULL,
-  year_of_study VARCHAR(20) NOT NULL,
+  course VARCHAR(100),
+  year_of_study VARCHAR(20),
   bio TEXT,
   offers_help BOOLEAN DEFAULT FALSE,
   role ENUM('student', 'admin') DEFAULT 'student'
@@ -34,20 +34,32 @@ CREATE TABLE user_subjects (
 
 CREATE TABLE sessions (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(150) NOT NULL,
+  title VARCHAR(255) NOT NULL,
   description TEXT,
-  subject_id INT NOT NULL,
-  mentor_id INT NOT NULL,
   session_time DATETIME,
-  location VARCHAR(120),
-  FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-  FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE
+  location VARCHAR(255),
+  meeting_link VARCHAR(255),
+  mentor_id INT,
+  subject_id INT,
+  FOREIGN KEY (mentor_id) REFERENCES users(id),
+  FOREIGN KEY (subject_id) REFERENCES subjects(id)
+);
+
+CREATE TABLE study_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  message TEXT,
+  status ENUM('pending','accepted','declined') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES users(id),
+  FOREIGN KEY (receiver_id) REFERENCES users(id)
 );
 
 INSERT INTO users (name, email, password_hash, course, year_of_study, bio, offers_help, role) VALUES
 ('Aung Min', 'aung@studybuddy.com', '$2b$10$examplehashstudent1', 'BSc Software Engineering', '2', 'Second-year student looking for help with core software engineering concepts.', FALSE, 'student'),
 ('Emily Carter', 'emily@studybuddy.com', '$2b$10$examplehashstudent2', 'BSc Software Engineering', '3', 'Final-year student confident in software engineering and willing to help others.', TRUE, 'student'),
-('System Admin', 'admin@studybuddy.com', '$2b$10$examplehashadmin', 'Platform Administration', 'N/A', 'Technical system administrator responsible for maintaining Study Buddy.', FALSE, 'admin');
+('System Admin', 'admin@studybuddy.com', '$2b$10$EIX8zR7Fv6m6H7l8Q9sX.u1b0bF0zY6x9Xkq0G0qFJvG9s9Y9y9yK', 'Platform Administration', 'N/A', 'Technical system administrator responsible for maintaining Study Buddy.', FALSE, 'admin');
 
 INSERT INTO subjects (name) VALUES
 ('Software Engineering'),
