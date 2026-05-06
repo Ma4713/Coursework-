@@ -460,6 +460,36 @@ app.get("/admin/requests", requireAdmin, (req, res) => {
   );
 });
 
+app.post("/requests/:id/accept", requireStudent, (req, res) => {
+  connection.query(
+    "UPDATE study_requests SET status = 'accepted' WHERE id = ?",
+    [req.params.id],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error accepting request");
+      }
+
+      res.redirect("/requests");
+    },
+  );
+});
+
+app.post("/requests/:id/decline", requireStudent, (req, res) => {
+  connection.query(
+    "UPDATE study_requests SET status = 'declined' WHERE id = ?",
+    [req.params.id],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error declining request");
+      }
+
+      res.redirect("/requests");
+    },
+  );
+});
+
 app.listen(3000, () => {
   console.log("Study Buddy running on http://localhost:3000");
 });

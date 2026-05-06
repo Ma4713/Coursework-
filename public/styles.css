@@ -422,3 +422,14 @@ input.search-bar {
 .button-danger:hover {
   background: #8f2f2f;
 }
+
+.user-welcome {
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-right: 10px;
+}
+
+.success-message {
+  color: #2f7a4d;
+  font-weight: 600;
+}

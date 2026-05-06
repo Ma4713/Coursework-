@@ -9,9 +9,28 @@ block content
     each request in requests
       .card
         h2.card-title= request.sender_name
+
         p= request.message
-        p.meta Status: #{request.status}
+
+        p.meta
+          strong Status:
+          |  #{request.status}
+
         p.meta Sent: #{request.created_at}
+
+        if request.status === 'pending'
+          .actions-row
+            form(method='POST', action=`/requests/${request.id}/accept`)
+              button.button(type='submit') Accept
+
+            form(method='POST', action=`/requests/${request.id}/decline`)
+              button.button-danger(type='submit') Decline
+
+        if request.status === 'accepted'
+          p.success-message Request accepted.
+
+        if request.status === 'declined'
+          p.meta Request declined.
 
     if requests.length === 0
       .card
