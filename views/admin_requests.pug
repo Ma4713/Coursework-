@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Manage Study Requests
+    p View student study buddy requests.
+
+  .card
+    table
+      thead
+        tr
+          th Sender
+          th Receiver
+          th Message
+          th Status
+          th Created
+      tbody
+        each request in requests
+          tr
+            td #{request.sender_name}
+            td #{request.receiver_name}
+            td #{request.message}
+            td #{request.status}
+            td #{request.created_at}
+
+  .footer-action
+    a.button-secondary(href='/admin') Back to Dashboard

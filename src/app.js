@@ -9,7 +9,6 @@ const app = express();
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "../views"));
 app.use(express.static(path.join(__dirname, "../public")));
-
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -26,8 +25,13 @@ app.use((req, res, next) => {
 });
 
 function requireLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect("/login");
+  if (!req.session.user) return res.redirect("/login");
+  next();
+}
+
+function requireStudent(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "student") {
+    return res.status(403).send("Student access only");
   }
   next();
 }
@@ -39,42 +43,16 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-function requireStudent(req, res, next) {
-  if (!req.session.user || req.session.user.role !== "student") {
-    return res.status(403).send("Student access only");
-  }
-  next();
-}
-
 app.get("/", (req, res) => {
   res.render("index", { title: "Home", activePage: "home" });
 });
 
-app.get("/users", requireStudent, (req, res) => {
-  connection.query("SELECT * FROM users", (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.send("Error fetching users");
-    }
-
-    res.render("users", {
-      users: results,
-      title: "Users",
-      activePage: "users",
-    });
-  });
-});
-
 app.get("/register", (req, res) => {
-  res.render("register", {
-    title: "Register",
-    activePage: "register",
-  });
+  res.render("register", { title: "Register", activePage: "register" });
 });
 
 app.post("/register", async (req, res) => {
   const { name, email, password, course, year_of_study } = req.body;
-
   const passwordHash = await bcrypt.hash(password, 10);
 
   connection.query(
@@ -95,18 +73,13 @@ app.post("/register", async (req, res) => {
         console.error(err);
         return res.send("Error creating account");
       }
-
       res.redirect("/login");
     },
   );
 });
 
-
 app.get("/login", (req, res) => {
-  res.render("login", {
-    title: "Login",
-    activePage: "login",
-  });
+  res.render("login", { title: "Login", activePage: "login" });
 });
 
 app.post("/login", (req, res) => {
@@ -126,7 +99,13 @@ app.post("/login", (req, res) => {
       }
 
       const user = results[0];
-      const passwordMatch = await bcrypt.compare(password, user.password_hash);
+      let passwordMatch = false;
+
+      if (user.password_hash.startsWith("$2")) {
+        passwordMatch = await bcrypt.compare(password, user.password_hash);
+      } else {
+        passwordMatch = password === user.password_hash;
+      }
 
       if (!passwordMatch) {
         return res.send("Invalid email or password");
@@ -138,11 +117,8 @@ app.post("/login", (req, res) => {
         role: user.role,
       };
 
-      if (user.role === "admin") {
-        return res.redirect("/admin");
-      }
-
-      res.redirect("/");
+      if (user.role === "admin") return res.redirect("/admin");
+      res.redirect("/dashboard");
     },
   );
 });
@@ -153,32 +129,108 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/users/:id", requireStudent, (req, res) => {
-  const userId = req.params.id;
+app.get("/dashboard", requireStudent, (req, res) => {
+  res.render("dashboard", { title: "Dashboard", activePage: "dashboard" });
+});
 
+app.get("/profile/edit", requireStudent, (req, res) => {
+  connection.query(
+    "SELECT * FROM users WHERE id = ?",
+    [req.session.user.id],
+    (err, results) => {
+      if (err) return res.send("Error loading profile");
+
+      res.render("edit_profile", {
+        title: "Edit Profile",
+        activePage: "dashboard",
+        user: results[0],
+      });
+    },
+  );
+});
+
+app.post("/profile/edit", requireStudent, (req, res) => {
+  const { bio, course, year_of_study, offers_help } = req.body;
+
+  connection.query(
+    `UPDATE users SET bio = ?, course = ?, year_of_study = ?, offers_help = ? WHERE id = ?`,
+    [bio, course, year_of_study, offers_help === "on", req.session.user.id],
+    (err) => {
+      if (err) return res.send("Error updating profile");
+      res.redirect(`/users/${req.session.user.id}`);
+    },
+  );
+});
+
+app.get("/users", requireStudent, (req, res) => {
+  connection.query(
+    "SELECT * FROM users WHERE role = 'student'",
+    (err, results) => {
+      if (err) return res.send("Error fetching users");
+
+      res.render("users", {
+        users: results,
+        title: "Users",
+        activePage: "users",
+      });
+    },
+  );
+});
+
+app.get("/users/:id", requireStudent, (req, res) => {
   connection.query(
     `
     SELECT users.*, subjects.name AS subject_name, user_subjects.type
     FROM users
     LEFT JOIN user_subjects ON users.id = user_subjects.user_id
     LEFT JOIN subjects ON user_subjects.subject_id = subjects.id
-    WHERE users.id = ?
+    WHERE users.id = ? AND users.role = 'student'
     `,
-    [userId],
+    [req.params.id],
     (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.send("Error fetching user");
-      }
-
-      if (results.length === 0) {
-        return res.send("User not found");
-      }
+      if (err) return res.send("Error fetching user");
+      if (results.length === 0) return res.send("User not found");
 
       res.render("profile", {
         user: results,
         title: results[0].name,
         activePage: "users",
+      });
+    },
+  );
+});
+
+app.post("/users/:id/request", requireStudent, (req, res) => {
+  const receiverId = req.params.id;
+  const { message } = req.body;
+
+  connection.query(
+    `INSERT INTO study_requests (sender_id, receiver_id, message) VALUES (?, ?, ?)`,
+    [req.session.user.id, receiverId, message],
+    (err) => {
+      if (err) return res.send("Error sending request");
+      res.redirect(`/users/${receiverId}`);
+    },
+  );
+});
+
+app.get("/requests", requireStudent, (req, res) => {
+  connection.query(
+    `
+    SELECT study_requests.*, users.name AS sender_name
+    FROM study_requests
+    JOIN users ON study_requests.sender_id = users.id
+    WHERE receiver_id = ?
+    ORDER BY created_at DESC
+    `,
+    [req.session.user.id],
+    (err, results) => {
+      if (err) return res.send("Error loading requests");
+
+      res.render("requests", {
+        title: "Requests",
+        activePage: "requests",
+        requests: results,
       });
     },
   );
@@ -197,10 +249,7 @@ app.get("/sessions", requireStudent, (req, res) => {
     `,
     [`%${search}%`, `%${search}%`],
     (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.send("Error fetching sessions");
-      }
+      if (err) return res.send("Error fetching sessions");
 
       res.render("sessions", {
         sessions: results,
@@ -212,9 +261,53 @@ app.get("/sessions", requireStudent, (req, res) => {
   );
 });
 
-app.get("/sessions/:id", requireStudent, (req, res) => {
-  const sessionId = req.params.id;
+app.get("/sessions/new", requireStudent, (req, res) => {
+  connection.query("SELECT * FROM subjects", (err, subjects) => {
+    if (err) return res.send("Error loading subjects");
 
+    res.render("new_session", {
+      title: "Create Session",
+      activePage: "sessions",
+      subjects,
+    });
+  });
+});
+
+app.post("/sessions/new", requireStudent, (req, res) => {
+  const {
+    title,
+    description,
+    subject_id,
+    session_time,
+    location,
+    meeting_link,
+  } = req.body;
+
+  connection.query(
+    `
+    INSERT INTO sessions (title, description, subject_id, mentor_id, session_time, location, meeting_link)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      title,
+      description,
+      subject_id,
+      req.session.user.id,
+      session_time,
+      location,
+      meeting_link,
+    ],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error creating session");
+      }
+      res.redirect("/sessions");
+    },
+  );
+});
+
+app.get("/sessions/:id", requireStudent, (req, res) => {
   connection.query(
     `
     SELECT sessions.*, users.name AS mentor_name, users.id AS mentor_user_id, subjects.name AS subject_name
@@ -223,16 +316,10 @@ app.get("/sessions/:id", requireStudent, (req, res) => {
     JOIN subjects ON sessions.subject_id = subjects.id
     WHERE sessions.id = ?
     `,
-    [sessionId],
+    [req.params.id],
     (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.send("Error fetching session");
-      }
-
-      if (results.length === 0) {
-        return res.send("Session not found");
-      }
+      if (err) return res.send("Error fetching session");
+      if (results.length === 0) return res.send("Session not found");
 
       res.render("session_detail", {
         session: results[0],
@@ -244,32 +331,13 @@ app.get("/sessions/:id", requireStudent, (req, res) => {
 });
 
 app.get("/sessions/:id/join", requireStudent, (req, res) => {
-  const sessionId = req.params.id;
-
   connection.query(
-    `
-    SELECT sessions.*, subjects.name AS subject_name
-    FROM sessions
-    JOIN subjects ON sessions.subject_id = subjects.id
-    WHERE sessions.id = ?
-    `,
-    [sessionId],
-    (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.send("Error joining session");
-      }
-
-      if (results.length === 0) {
-        return res.send("Session not found");
-      }
-
-      res.render("join_session", {
-        session: results[0],
-        title: "Join Session",
-        activePage: "sessions",
-      });
-    }
+    "INSERT INTO joined_sessions (user_id, session_id) VALUES (?, ?)",
+    [req.session.user.id, req.params.id],
+    (err) => {
+      if (err) return res.send("Error joining session");
+      res.redirect(`/sessions/${req.params.id}`);
+    },
   );
 });
 
@@ -306,10 +374,7 @@ app.get("/admin", requireAdmin, (req, res) => {
 
 app.get("/admin/users", requireAdmin, (req, res) => {
   connection.query("SELECT * FROM users", (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.send("Error loading users");
-    }
+    if (err) return res.send("Error loading users");
 
     res.render("admin_users", {
       title: "Manage Users",
@@ -328,15 +393,68 @@ app.get("/admin/sessions", requireAdmin, (req, res) => {
     JOIN subjects ON sessions.subject_id = subjects.id
     `,
     (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.send("Error loading sessions");
-      }
+      if (err) return res.send("Error loading sessions");
 
       res.render("admin_sessions", {
         title: "Manage Sessions",
         sessions: results,
         activePage: "admin",
+      });
+    },
+  );
+});
+
+app.post("/admin/users/:id/delete", requireAdmin, (req, res) => {
+  const userId = req.params.id;
+
+  if (Number(userId) === req.session.user.id) {
+    return res.send("You cannot delete your own admin account.");
+  }
+
+  connection.query("DELETE FROM users WHERE id = ?", [userId], (err) => {
+    if (err) {
+      console.error(err);
+      return res.send("Error deleting user");
+    }
+
+    res.redirect("/admin/users");
+  });
+});
+
+app.post("/admin/sessions/:id/delete", requireAdmin, (req, res) => {
+  const sessionId = req.params.id;
+
+  connection.query("DELETE FROM sessions WHERE id = ?", [sessionId], (err) => {
+    if (err) {
+      console.error(err);
+      return res.send("Error deleting session");
+    }
+
+    res.redirect("/admin/sessions");
+  });
+});
+
+app.get("/admin/requests", requireAdmin, (req, res) => {
+  connection.query(
+    `
+    SELECT study_requests.*, 
+           sender.name AS sender_name,
+           receiver.name AS receiver_name
+    FROM study_requests
+    JOIN users sender ON study_requests.sender_id = sender.id
+    JOIN users receiver ON study_requests.receiver_id = receiver.id
+    ORDER BY study_requests.created_at DESC
+    `,
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error loading requests");
+      }
+
+      res.render("admin_requests", {
+        title: "Manage Requests",
+        activePage: "admin",
+        requests: results,
       });
     },
   );

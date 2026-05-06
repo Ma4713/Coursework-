@@ -376,3 +376,49 @@ th {
   background: #fff4e8;
 }
 }
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eadfd4;
+  text-align: left;
+}
+
+th {
+  color: var(--primary-dark);
+  background: #fff4e8;
+}
+
+textarea.search-bar,
+select.search-bar,
+input.search-bar {
+  display: block;
+  width: 100%;
+}
+
+.button-danger {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: #b23b3b;
+  color: white;
+}
+
+.button-danger:hover {
+  background: #8f2f2f;
+}

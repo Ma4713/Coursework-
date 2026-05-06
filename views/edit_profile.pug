@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Edit My Profile
+    p Update your Study Buddy profile details.
+
+  .card
+    form(method='POST', action='/profile/edit')
+      p
+        label Course
+        input.search-bar(type='text', name='course', value=user.course)
+
+      p
+        label Year of Study
+        input.search-bar(type='text', name='year_of_study', value=user.year_of_study)
+
+      p
+        label Bio
+        textarea.search-bar(name='bio', rows='5')= user.bio
+
+      p
+        label
+          input(type='checkbox', name='offers_help', checked=user.offers_help)
+          |  I want to offer help as a mentor
+
+      .actions-row
+        button.button(type='submit') Save Profile
+        a.button-secondary(href='/dashboard') Cancel

@@ -11,6 +11,7 @@ block content
       .actions-row
         button.button(type='submit') Search
         a.button-secondary(href='/sessions') Reset
+        a.button(href='/sessions/new') Create Session
 
   .session-grid
     each session in sessions
@@ -23,3 +24,7 @@ block content
         .actions-row
           a.button-secondary(href=`/sessions/${session.id}`) View Details
           a.button(href=`/sessions/${session.id}/join`) Join Session
+
+    if sessions.length === 0
+      .card
+        p No sessions found.

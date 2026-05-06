@@ -19,8 +19,10 @@ html
             a(class=activePage === 'register' ? 'active' : '', href='/register') Register
 
           if session.user && session.user.role === 'student'
+            a(class=activePage === 'dashboard' ? 'active' : '', href='/dashboard') Dashboard
             a(class=activePage === 'users' ? 'active' : '', href='/users') Users
             a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
+            a(class=activePage === 'requests' ? 'active' : '', href='/requests') Requests
             a(href='/logout') Logout
 
           if session.user && session.user.role === 'admin'

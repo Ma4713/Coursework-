@@ -15,19 +15,22 @@ block content
       p
         strong Description:
       p= session.description
+
       .actions-row
-        a.button(href='/sessions') Join Session
+        a.button(href=`/sessions/${session.id}/join`) Join Session
+        if session.meeting_link
+          a.button-secondary(href=session.meeting_link, target='_blank') Join Online Meeting
 
     .host-panel.center
       h3 Hosted by
       p.card-title= session.mentor_name
       .avatar-medium= session.mentor_name.charAt(0)
       .actions-row.center
-        a.button-secondary(href=`/users/${session.mentor_user_id}`) View Profile
+        a.button-secondary(href=`/users/${session.mentor_user_id}`) View Mentor Profile
 
   .feedback-panel
     h3 Session Feedback
     .divider
-    p This session page is ready for future private feedback functionality.
+    p This area is ready for future private feedback functionality.
     .actions-row
       a.button-secondary(href='/sessions') Back to Sessions

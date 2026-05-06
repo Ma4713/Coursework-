@@ -40,6 +40,16 @@ block content
           p Mon–Fri
           p 14:30–18:00
 
+      if session.user && session.user.id === user[0].id
+        .actions-row
+          a.button(href='/profile/edit') Edit My Profile
+
+      if session.user && session.user.id !== user[0].id
+        .card
+          h2.card-title Request Study Buddy
+          form(method='POST', action=`/users/${user[0].id}/request`)
+            textarea.search-bar(name='message', rows='4', placeholder='Write a short message...')
+            button.button(type='submit') Send Request
+
       .actions-row
-        a.button(href='/sessions') Request Study Buddy
         a.button-secondary(href='/users') Back to Users

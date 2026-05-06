@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Study Requests
+    p Messages from students who want to connect with you.
+
+  .session-grid
+    each request in requests
+      .card
+        h2.card-title= request.sender_name
+        p= request.message
+        p.meta Status: #{request.status}
+        p.meta Sent: #{request.created_at}
+
+    if requests.length === 0
+      .card
+        p No requests yet.

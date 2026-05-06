@@ -10,4 +10,26 @@ block content
     p Browse student profiles and explore available study sessions using the navigation above.
     .actions-row
       a.button(href='/users') View Users
-      a.button-secondary(href='/sessions') View Study Sessions
+      a.button-secondary(href='/sessions') View Study Sessionsextends layout
+
+block content
+  .page-hero
+    h1 Study Buddy
+    p A peer-support platform where university students can connect, share knowledge, and support each other.
+
+  .card
+    h2.card-title Welcome to Study Buddy
+    p Study Buddy helps students find peer support in a low-pressure and community-focused way.
+
+    if !session.user
+      .actions-row
+        a.button(href='/login') Login
+        a.button-secondary(href='/register') Register
+
+    if session.user && session.user.role === 'student'
+      .actions-row
+        a.button(href='/dashboard') Go to Dashboard
+
+    if session.user && session.user.role === 'admin'
+      .actions-row
+        a.button(href='/admin') Go to Admin Dashboard

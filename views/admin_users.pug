@@ -3,7 +3,7 @@ extends layout
 block content
   .page-hero
     h1 Manage Users
-    p System Administrator control panel.
+    p System Administrator user overview.
 
   .card
     table
@@ -13,6 +13,8 @@ block content
           th Name
           th Email
           th Role
+          th Offers Help
+          th Action
       tbody
         each user in users
           tr
@@ -20,6 +22,13 @@ block content
             td #{user.name}
             td #{user.email}
             td #{user.role}
+            td #{user.offers_help ? 'Yes' : 'No'}
+            td
+              if user.id !== session.user.id
+                form(method='POST', action=`/admin/users/${user.id}/delete`)
+                  button.button-danger(type='submit') Delete
+              else
+                span.meta Current Admin
 
   .footer-action
     a.button-secondary(href='/admin') Back to Dashboard

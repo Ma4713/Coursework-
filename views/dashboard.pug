@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Student Dashboard
+    p Welcome to Study Buddy. Manage your profile, browse students, and join study sessions.
+
+  .grid.grid-3
+    .card.center
+      h2.card-title My Profile
+      p.meta Update your bio and study details.
+      a.button(href='/profile/edit') Edit Profile
+
+    .card.center
+      h2.card-title Find Students
+      p.meta Browse learners and mentors.
+      a.button(href='/users') View Users
+
+    .card.center
+      h2.card-title Study Sessions
+      p.meta Browse or create sessions.
+      a.button(href='/sessions') View Sessions

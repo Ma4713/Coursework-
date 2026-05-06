@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Create Study Session
+    p Create a session and paste a Zoom, Teams, or Google Meet link.
+
+  .card
+    form(method='POST', action='/sessions/new')
+      p
+        label Title
+        input.search-bar(type='text', name='title', required=true)
+
+      p
+        label Description
+        textarea.search-bar(name='description', rows='5', required=true)
+
+      p
+        label Subject
+        select.search-bar(name='subject_id', required=true)
+          each subject in subjects
+            option(value=subject.id)= subject.name
+
+      p
+        label Date and Time
+        input.search-bar(type='datetime-local', name='session_time', required=true)
+
+      p
+        label Location
+        input.search-bar(type='text', name='location', placeholder='Library Room 2 or Online')
+
+      p
+        label Meeting Link
+        input.search-bar(type='url', name='meeting_link', placeholder='Paste Zoom, Teams, or Google Meet link')
+
+      button.button(type='submit') Create Session

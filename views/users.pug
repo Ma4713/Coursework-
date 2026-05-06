@@ -5,21 +5,12 @@ block content
     h1 User List
     p Browse through learners and mentors to connect with your study buddies.
 
-  .toolbar
-    input.search-bar(type='text', placeholder='Search by subject...')
-    .filters
-      .filter-pill All Subjects
-      .filter-pill Learners
-      .filter-pill Mentors
-
   .user-grid
     each user in users
       .card.center
         .avatar-medium= user.name.charAt(0)
         h2.card-title= user.name
         p.meta Role: #{user.offers_help ? 'Mentor' : 'Learner'}
+        p.meta #{user.course || 'Course not added'} · Year #{user.year_of_study || 'N/A'}
         .actions-row.center
           a.button-secondary(href=`/users/${user.id}`) View Profile
-
-  .footer-action
-    a.button(href='/sessions') View Study Sessions

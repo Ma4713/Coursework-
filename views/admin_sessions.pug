@@ -14,6 +14,7 @@ block content
           th Mentor
           th Time
           th Location
+          th Action
       tbody
         each session in sessions
           tr
@@ -22,6 +23,9 @@ block content
             td #{session.mentor_name}
             td #{session.session_time}
             td #{session.location}
+            td
+              form(method='POST', action=`/admin/sessions/${session.id}/delete`)
+                button.button-danger(type='submit') Delete
 
   .footer-action
     a.button-secondary(href='/admin') Back to Dashboard
