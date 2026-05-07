@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  .page-hero
+    h1 Session Feedback
+    p System Administrator feedback overview.
+
+  .card
+    table
+      thead
+        tr
+          th User
+          th Session
+          th Rating
+          th Comment
+      tbody
+        each item in feedback
+          tr
+            td #{item.user_name}
+            td #{item.session_title}
+            td #{item.rating}/5
+            td #{item.comment}
+
+  .footer-action
+    a.button-secondary(href='/admin') Back to Dashboard

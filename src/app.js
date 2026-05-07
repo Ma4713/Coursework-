@@ -308,24 +308,53 @@ app.post("/sessions/new", requireStudent, (req, res) => {
 });
 
 app.get("/sessions/:id", requireStudent, (req, res) => {
+  const sessionId = req.params.id;
+
   connection.query(
     `
-    SELECT sessions.*, users.name AS mentor_name, users.id AS mentor_user_id, subjects.name AS subject_name
+    SELECT sessions.*, 
+           users.name AS mentor_name,
+           users.id AS mentor_user_id,
+           subjects.name AS subject_name
     FROM sessions
     JOIN users ON sessions.mentor_id = users.id
     JOIN subjects ON sessions.subject_id = subjects.id
     WHERE sessions.id = ?
     `,
-    [req.params.id],
-    (err, results) => {
-      if (err) return res.send("Error fetching session");
-      if (results.length === 0) return res.send("Session not found");
+    [sessionId],
+    (err, sessionResults) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error fetching session");
+      }
 
-      res.render("session_detail", {
-        session: results[0],
-        title: results[0].title,
-        activePage: "sessions",
-      });
+      if (sessionResults.length === 0) {
+        return res.send("Session not found");
+      }
+
+      connection.query(
+        `
+        SELECT feedback.*, users.name AS user_name
+        FROM feedback
+        JOIN users ON feedback.user_id = users.id
+        WHERE feedback.session_id = ?
+        ORDER BY feedback.created_at DESC
+        `,
+        [sessionId],
+        (err, feedbackResults) => {
+          if (err) {
+            console.error(err);
+            return res.send("Error fetching feedback");
+          }
+
+          res.render("session_detail", {
+            session: sessionResults[0],
+            feedback: feedbackResults,
+            title: sessionResults[0].title,
+            activePage: "sessions",
+          });
+        },
+      );
     },
   );
 });
@@ -486,6 +515,53 @@ app.post("/requests/:id/decline", requireStudent, (req, res) => {
       }
 
       res.redirect("/requests");
+    },
+  );
+});
+
+app.post("/sessions/:id/feedback", requireStudent, (req, res) => {
+  const sessionId = req.params.id;
+  const { rating, comment } = req.body;
+
+  connection.query(
+    `
+    INSERT INTO feedback (session_id, user_id, rating, comment)
+    VALUES (?, ?, ?, ?)
+    `,
+    [sessionId, req.session.user.id, rating, comment],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error submitting feedback");
+      }
+
+      res.redirect(`/sessions/${sessionId}`);
+    },
+  );
+});
+
+app.get("/admin/feedback", requireAdmin, (req, res) => {
+  connection.query(
+    `
+    SELECT feedback.*, 
+           users.name AS user_name,
+           sessions.title AS session_title
+    FROM feedback
+    JOIN users ON feedback.user_id = users.id
+    JOIN sessions ON feedback.session_id = sessions.id
+    ORDER BY feedback.created_at DESC
+    `,
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.send("Error loading feedback");
+      }
+
+      res.render("admin_feedback", {
+        title: "Manage Feedback",
+        activePage: "admin",
+        feedback: results,
+      });
     },
   );
 });

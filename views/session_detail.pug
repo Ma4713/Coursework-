@@ -7,30 +7,69 @@ block content
   .session-detail-layout
     .session-summary
       h2= session.title
+
       .divider
+
       .subject-tags
         span.subject-tag= session.subject_name
+
       p.meta Date / Time: #{session.session_time}
       p.meta Location: #{session.location}
+
       p
         strong Description:
+
       p= session.description
 
       .actions-row
         a.button(href=`/sessions/${session.id}/join`) Join Session
+
         if session.meeting_link
           a.button-secondary(href=session.meeting_link, target='_blank') Join Online Meeting
 
     .host-panel.center
       h3 Hosted by
       p.card-title= session.mentor_name
+
       .avatar-medium= session.mentor_name.charAt(0)
+
       .actions-row.center
         a.button-secondary(href=`/users/${session.mentor_user_id}`) View Mentor Profile
 
   .feedback-panel
-    h3 Session Feedback
+    h2.card-title Session Feedback
+
     .divider
-    p This area is ready for future private feedback functionality.
-    .actions-row
-      a.button-secondary(href='/sessions') Back to Sessions
+
+    form(method='POST', action=`/sessions/${session.id}/feedback`)
+      p
+        label Rating
+        select.search-bar(name='rating', required=true)
+          option(value='5') 5 - Excellent
+          option(value='4') 4 - Good
+          option(value='3') 3 - Average
+          option(value='2') 2 - Poor
+          option(value='1') 1 - Very Poor
+
+      p
+        label Comment
+        textarea.search-bar(name='comment', rows='4', placeholder='Share your feedback...', required=true)
+
+      button.button(type='submit') Submit Feedback
+
+    .divider
+
+    if feedback.length > 0
+      each item in feedback
+        .card
+          h3.card-title= item.user_name
+          p.meta Rating: #{item.rating}/5
+          p= item.comment
+          p.meta Submitted: #{item.created_at}
+
+    if feedback.length === 0
+      .card
+        p No feedback has been submitted yet.
+
+  .actions-row
+    a.button-secondary(href='/sessions') Back to Sessions
