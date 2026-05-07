@@ -5,27 +5,27 @@ block content
     h1 System Admin Dashboard
     p Technical admin area for maintaining Study Buddy.
 
-  .grid.grid-3
+  .grid.grid-4
     .card.center
       h2.card-title Users
       p.meta Total Users
-      h1= totalUsers
+      h1.dashboard-number= totalUsers
       a.button(href='/admin/users') Manage Users
-    
-    .card.center
-      h2.card-title Feedback
-      p.meta Session reviews
-      a.button(href='/admin/feedback') View Feedback   
 
     .card.center
       h2.card-title Sessions
       p.meta Total Sessions
-      h1= totalSessions
+      h1.dashboard-number= totalSessions
       a.button(href='/admin/sessions') Manage Sessions
 
     .card.center
-      h2.card-title Subjects
-      p.meta Total Subjects
-      h1= totalSubjects
+      h2.card-title Requests
+      p.meta Total Requests
+      h1.dashboard-number= totalRequests
+      a.button(href='/admin/requests') View Requests
 
-      a.button-secondary(href='/admin/requests') View Requests
+    .card.center
+      h2.card-title Feedback
+      p.meta Total Feedback
+      h1.dashboard-number= totalFeedback
+      a.button(href='/admin/feedback') View Feedback

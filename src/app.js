@@ -382,17 +382,25 @@ app.get("/admin", requireAdmin, (req, res) => {
           if (err) return res.send("Error loading sessions count");
 
           connection.query(
-            "SELECT COUNT(*) AS totalSubjects FROM subjects",
-            (err, subjectsResult) => {
-              if (err) return res.send("Error loading subjects count");
+            "SELECT COUNT(*) AS totalRequests FROM study_requests",
+            (err, requestsResult) => {
+              if (err) return res.send("Error loading requests count");
 
-              res.render("admin", {
-                title: "Admin Dashboard",
-                activePage: "admin",
-                totalUsers: usersResult[0].totalUsers,
-                totalSessions: sessionsResult[0].totalSessions,
-                totalSubjects: subjectsResult[0].totalSubjects,
-              });
+              connection.query(
+                "SELECT COUNT(*) AS totalFeedback FROM feedback",
+                (err, feedbackResult) => {
+                  if (err) return res.send("Error loading feedback count");
+
+                  res.render("admin", {
+                    title: "Admin Dashboard",
+                    activePage: "admin",
+                    totalUsers: usersResult[0].totalUsers,
+                    totalSessions: sessionsResult[0].totalSessions,
+                    totalRequests: requestsResult[0].totalRequests,
+                    totalFeedback: feedbackResult[0].totalFeedback,
+                  });
+                },
+              );
             },
           );
         },

@@ -13,15 +13,15 @@ html
           img.brand-logo(src='/images/studybuddy-logo.png', alt='Study Buddy logo')
 
         nav.nav
-          a(class=activePage === 'home' ? 'active' : '', href='/') Home
-
           if !session.user
+            a(class=activePage === 'home' ? 'active' : '', href='/') Home
             a(class=activePage === 'login' ? 'active' : '', href='/login') Login
             a(class=activePage === 'register' ? 'active' : '', href='/register') Register
 
           if session.user && session.user.role === 'student'
-            span.user-welcome Welcome, #{session.user.name}
-
+            span.user-pill
+              span.user-dot
+              | #{session.user.name}
             a(class=activePage === 'dashboard' ? 'active' : '', href='/dashboard') Dashboard
             a(class=activePage === 'users' ? 'active' : '', href='/users') Users
             a(class=activePage === 'sessions' ? 'active' : '', href='/sessions') Sessions
@@ -29,8 +29,9 @@ html
             a(href='/logout') Logout
 
           if session.user && session.user.role === 'admin'
-            span.user-welcome Welcome, #{session.user.name}
-
+            span.user-pill
+              span.user-dot
+              | #{session.user.name}
             a(class=activePage === 'admin' ? 'active' : '', href='/admin') Admin Dashboard
             a(href='/logout') Logout
 
